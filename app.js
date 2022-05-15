@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const router = express.Router({});
 const path = require("path");
-const PORT = process.env.PORT || 8080;
+const PORT =  5000;
 
 app.use(bodyParser.json())
 app.use(cors())
