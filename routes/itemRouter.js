@@ -3,6 +3,7 @@ const router = require("express").Router();
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const Item = require("../models/Item");
+const Category = require("../models/Category")
 
 const storage = multer.diskStorage({
     destination: './uploads/images',
@@ -18,8 +19,8 @@ const upload = multer({storage:storage});
 router.post("/add", upload.single('image'), async (req,res) => {
 
     const item = new Item({
-        shop: "627a85d42c0f408a158cf788",
-        category: "627a89932c0f408a158cf789",
+        shop: req.body.shop,
+        category:req.body.category,
         title : req.body.title,
         description: req.body.description,
         quantity: req.body.quantity,
@@ -29,22 +30,24 @@ router.post("/add", upload.single('image'), async (req,res) => {
     });
 
     item.save().then((item) => {
-            res.json({status:201, item:item})
-        }).catch((err) => {
-            res.json({status:400, message:err})
-        })
+        res.json({status:201, item:item})
+    }).catch((err) => {
+        res.json({status:400, message:err})
+    })
 })
 
 router.put("/update/:id", upload.single('image'), async (req,res) => {
 
     const updatedItem = {
-        category: "627a89932c0f408a158cf789",
+        category:req.body.category,
         title : req.body.title,
         description: req.body.description,
         quantity: req.body.quantity,
         price:req.body.price,
         status: req.body.status
     };
+
+    console.log(req.body)
 
     if(req.file) {
         updatedItem.image = req.file.filename;
@@ -61,19 +64,17 @@ router.put("/update/:id", upload.single('image'), async (req,res) => {
 
 })
 
-router.route("/:shop_id").get((req,res) => {
-    const shopId = req.params.shop_id;
-    Item.find({'shop': shopId} ).then((items) => {
-        res.json({items});
+router.route("/categories").get((req,res) => {
+    Category.find().then((categories) => {
+        res.json({categories});
     }).catch((err) => {
         res.json({err});
     })
-
 })
 
-router.route("/:shop_id/:id").get(async (req, res) => {
+router.route("/:id").get(async (req, res) => {
     const itemId = req.params.id;
-    await Item.findOne({_id: itemId}).then((item) => {
+    await Item.findOne({_id: itemId}).populate('category').populate('shop').then((item) => {
         res.json({item});
     }).catch((err) => {
         res.json({err});

@@ -4,8 +4,8 @@ const  Schema = mongoose.Schema;
 const shopSchema = new Schema({
 
     seller: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId, ref: 'user',
+        required: true,
     },
 })
 
